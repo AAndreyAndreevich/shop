@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Форма покупки продукта</title>
+  <script type="text/javascript">
+    function buyProduct() {
+        // Получаем значения из полей формы
+        const shopId = document.getElementById('shopId').value;
+        const productId = document.getElementById('productId').value;
+        const count = document.getElementById('count').value;
+
+        // Проверяем, что поля не пустые
+        if (!shopId || !productId || !count) {
+            alert('Пожалуйста, заполните все поля.');
+            return;
+        }
+
+        // Формируем URL для запроса
+        const url = '/api/inv/buyProduct?shopId=' + encodeURIComponent(shopId) +
+                    '&productId=' + encodeURIComponent(productId) +
+                    '&count=' + encodeURIComponent(count);
+
+        // Отправляем запрос на сервер
+        fetch(url, { method: 'POST' })
+            .then(response => response.text())
+            .then(resultMessage => {
+                // Отображаем результат операции
+                document.getElementById('resultMessage').innerText = resultMessage;
+            })
+            .catch(error => {
+                console.error('Ошибка:', error);
+                document.getElementById('resultMessage').innerText = 'Произошла ошибка при выполнении операции.';
+            });
+    }
+  </script>
+</head>
+<body>
+<h1>Покупка продукта</h1>
+
+<label for="shopId">ID магазина:</label>
+<input type="number" id="shopId" required><br>
+
+<label for="productId">ID продукта:</label>
+<input type="number" id="productId" required><br>
+
+<label for="count">Количество:</label>
+<input type="number" id="count" required><br>
+
+<button type="button" onclick="buyProduct()">Купить</button>
+
+<p id="resultMessage"></p>
+
+<a href="/">На главную</a>
+</body>
+</html>
