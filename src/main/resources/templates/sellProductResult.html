@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Результат продажи продукта</title>
+</head>
+<body>
+<h1>Результат продажи продукта</h1>
+
+<p th:text="${resultMessage}">Здесь будет сообщение о результате операции</p>
+
+<a th:href="@{/api/inv/sellProductForm}">Назад к форме покупки</a>
+<a href="/">На главную</a>
+</body>
+</html>

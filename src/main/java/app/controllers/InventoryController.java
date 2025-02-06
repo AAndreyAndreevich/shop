@@ -50,8 +50,9 @@ public class InventoryController {
      */
     @GetMapping("/buyProductForm")
     public String buyProductForm() {
-        return "buyProductForm"; // Имя шаблона без расширения
+        return "buyProductForm";
     }
+
     /**
      * Создает запрос на покупку продукта из магазина
      * @param shopId магазин
@@ -69,9 +70,18 @@ public class InventoryController {
         String resultMessage = invService.addProductToInventory(shopId, productId, count);
 
         model.addAttribute("resultMessage", resultMessage);
-        model.addAttribute("shopId", shopId); // Можно добавить и другие данные, если нужно
+        model.addAttribute("shopId", shopId);
 
-        return "buyProductResult"; // Имя шаблона для отображения результата
+        return "buyProductResult";
+    }
+
+    /**
+     * Нужен для создания формы
+     * @return форму страницы
+     */
+    @GetMapping("/sellProductForm")
+    public String sellProductForm() {
+        return "sellProductForm";
     }
 
     /**
@@ -84,6 +94,12 @@ public class InventoryController {
     @PostMapping("/sellProduct")
     public String sellProduct(Model model, @RequestParam Long shopId, @RequestParam Long productId, @RequestParam Integer count) {
         log.info("Создан запрос на продажу продукта(-ов) из магазина с id: {}", shopId);
-        return invService.removeProductFromInventory(shopId, productId, count);
+
+        String resultMessage = invService.removeProductFromInventory(shopId, productId, count);
+
+        model.addAttribute("resultMessage", resultMessage);
+        model.addAttribute("shopId", shopId);
+
+        return "sellProductResult";
     }
 }
