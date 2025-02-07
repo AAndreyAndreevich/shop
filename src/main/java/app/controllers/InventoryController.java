@@ -31,6 +31,15 @@ public class InventoryController {
     }
 
     /**
+     * Нужен для создания формы
+     * @return форму страницы
+     */
+    @GetMapping("/getAllProductsForm")
+    public String getAllProductsForm() {
+        return "getAllProductsForm";
+    }
+
+    /**
      * Создает запрос на вызов списка продукта
      * @param shopId магазин
      * @return результат запроса
@@ -41,7 +50,7 @@ public class InventoryController {
         List<ProductDTO> products = invService.getAllProducts(shopId);
         model.addAttribute("products", products);
         model.addAttribute("shopId", shopId);
-        return "products";
+        return "getAllProductsResult";
     }
 
     /**
