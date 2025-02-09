@@ -1,5 +1,6 @@
 package app.services;
 
+import app.dtos.InventoryDTO;
 import app.dtos.ProductDTO;
 import app.entities.Inventory;
 import app.entities.Product;
@@ -33,7 +34,7 @@ public class InventoryService {
         this.invRepo = invRepo;
     }
 
-    public List<ProductDTO> getAllProducts(Long shopId) {
+    public List<InventoryDTO> getAllProducts(Long shopId) {
         List<Inventory> inventories = invRepo.findByShopId(shopId);
         if (inventories.isEmpty()) {
             log.warn("Продукты не найдены");
@@ -44,7 +45,8 @@ public class InventoryService {
                 .map(inventory -> {
                     Product product = inventory.getProduct();
                     if (product != null) {
-                        return new ProductDTO(product.getId(), product.getName(), product.getPrice());
+                        ProductDTO productDTO = new ProductDTO(product.getId(), product.getName(), product.getPrice());
+                        return new InventoryDTO(inventory.getId(), shopId, productDTO, inventory.getQuantity());
                     } else {
                         return null;
                     }

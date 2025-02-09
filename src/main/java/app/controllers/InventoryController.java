@@ -1,5 +1,6 @@
 package app.controllers;
 
+import app.dtos.InventoryDTO;
 import app.dtos.ProductDTO;
 import app.services.InventoryService;
 import app.services.ProductService;
@@ -47,8 +48,8 @@ public class InventoryController {
     @GetMapping("/getAllProducts")
     public String getAllProducts(Model model, @RequestParam Long shopId) {
         log.info("Создан запрос на список продуктов из магазина с id : {}", shopId);
-        List<ProductDTO> products = invService.getAllProducts(shopId);
-        model.addAttribute("products", products);
+        List<InventoryDTO> inventories = invService.getAllProducts(shopId);
+        model.addAttribute("inventories", inventories);
         model.addAttribute("shopId", shopId);
         return "getAllProductsResult";
     }

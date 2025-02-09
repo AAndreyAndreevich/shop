@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Список продуктов</title>
@@ -9,16 +9,18 @@
 <table>
     <thead>
     <tr>
-        <th>ID продукта</th>
-        <th>Название</th>
+        <th>ID продукта | </th>
+        <th>Название | </th>
+        <th>Цена | </th>
         <th>Количество</th>
     </tr>
     </thead>
     <tbody>
-    <tr th:each="product : ${products}">
-        <td th:text="${product.id}"></td>
-        <td th:text="${product.name}"></td>
-        <td th:text="${product.quantity}"></td>
+    <tr th:each="inventory : ${inventories}">
+        <td th:text="${inventory.productDTO.id}"></td>
+        <td th:text="${inventory.productDTO.name}"></td>
+        <td th:text="${inventory.productDTO.price}"></td>
+        <td th:text="${inventory.quantity}"></td>
     </tr>
     </tbody>
 </table>
