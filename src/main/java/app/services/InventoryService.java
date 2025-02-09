@@ -5,6 +5,7 @@ import app.dtos.ProductDTO;
 import app.entities.Inventory;
 import app.entities.Product;
 import app.entities.Shop;
+import app.handlers.NotFoundException;
 import app.repositories.InventoryRepository;
 import app.repositories.ProductRepository;
 import app.repositories.ShopRepository;
@@ -58,9 +59,9 @@ public class InventoryService {
     @Transactional
     public String addProductToInventory(Long shopId, Long productId, Integer count) {
         Shop shop = shopRepo.findById(shopId)
-                .orElseThrow(() -> new RuntimeException("Магазин не найден"));
+                .orElseThrow(() -> new NotFoundException("Магазин не найден"));
         Product product = productRepo.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Продукт не найден"));
+                .orElseThrow(() -> new NotFoundException("Продукт не найден"));
 
         Optional<Inventory> optionalInventory = invRepo.findByShopIdAndProductId(shopId, productId);
         Inventory inventory = optionalInventory.orElseGet(() -> createNewInventory(shop, product));
@@ -74,12 +75,12 @@ public class InventoryService {
     @Transactional
     public String removeProductFromInventory(Long shopId, Long productId, Integer count) {
         Shop shop = shopRepo.findById(shopId)
-                .orElseThrow(() -> new RuntimeException("Магазин не найден"));
+                .orElseThrow(() -> new NotFoundException("Магазин не найден"));
         Product product = productRepo.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Продукт не найден"));
+                .orElseThrow(() -> new NotFoundException("Продукт не найден"));
 
         Inventory inventory = invRepo.findByShopIdAndProductId(shopId, productId)
-                .orElseThrow(() -> new RuntimeException("Инвентарь не найден"));
+                .orElseThrow(() -> new NotFoundException("Инвентарь не найден"));
 
         if (inventory.getQuantity() < count) {
             return "Недостаточно товара на складе";

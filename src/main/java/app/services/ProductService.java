@@ -1,6 +1,7 @@
 package app.services;
 
 import app.entities.Product;
+import app.handlers.NotFoundException;
 import app.repositories.InventoryRepository;
 import app.repositories.ProductRepository;
 import app.repositories.ShopRepository;
@@ -17,14 +18,10 @@ public class ProductService {
 
     private static final Logger log = LoggerFactory.getLogger(ProductService.class);
     private final ProductRepository productRepo;
-    private final ShopRepository shopRepo;
-    private final InventoryRepository invRepo;
 
     @Autowired
-    public ProductService(ProductRepository productRepo, ShopRepository shopRepo, InventoryRepository invRepo) {
+    public ProductService(ProductRepository productRepo) {
         this.productRepo = productRepo;
-        this.shopRepo = shopRepo;
-        this.invRepo = invRepo;
     }
 
     @Transactional
@@ -46,7 +43,7 @@ public class ProductService {
     @Transactional
     public String deleteProduct(Long productId) {
         Product product = productRepo.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Такого продукта не существует"));
+                .orElseThrow(() -> new NotFoundException("Такого продукта не существует"));
         productRepo.delete(product);
         log.info("Продукт '{}' был удален", product.getName());
         return "Продукт удален";

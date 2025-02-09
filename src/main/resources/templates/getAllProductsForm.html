@@ -7,11 +7,20 @@
     function getAllProducts() {
         const shopId = document.getElementById('shopId').value;
         fetch(`/api/inv/getAllProducts?shopId=${shopId}`)
-            .then(response => response.text())
-            .then(data => {
-                document.getElementById('result').innerHTML = data;
-            })
-            .catch(error => console.error('Ошибка:', error));
+        .then(response => {
+            if(!response.ok) {
+                return response.text().then(errorMessage => {
+                    throw new Error(errorMessage);
+                });
+            }
+            return response.text();
+        })
+        .then(data => {
+            document.getElementById('result').innerHTML = data;
+        })
+        .catch(error => {
+            document.getElementById('result').innerHTML = '<span style="color: red;">Ошибка, такого магазина не существует</span>';
+        });
     }
   </script>
 </head>

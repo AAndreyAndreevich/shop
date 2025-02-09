@@ -1,16 +1,18 @@
 package app.controllers;
 
 import app.dtos.InventoryDTO;
-import app.dtos.ProductDTO;
+import app.handlers.NotFoundException;
 import app.services.InventoryService;
-import app.services.ProductService;
-import app.services.ShopService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.thymeleaf.context.Context;
+import org.thymeleaf.spring6.SpringTemplateEngine;
 
 import java.util.List;
 
@@ -21,14 +23,13 @@ public class InventoryController {
     private static final Logger log = LoggerFactory.getLogger(InventoryController.class);
 
     private final InventoryService invService;
-    private final ShopService shopService;
-    private final ProductService productService;
 
     @Autowired
-    public InventoryController(InventoryService invService, ShopService shopService, ProductService productService) {
+    private SpringTemplateEngine thymeleafTemplateEngine;
+
+    @Autowired
+    public InventoryController(InventoryService invService) {
         this.invService = invService;
-        this.shopService = shopService;
-        this.productService = productService;
     }
 
     /**
@@ -46,12 +47,19 @@ public class InventoryController {
      * @return результат запроса
      */
     @GetMapping("/getAllProducts")
-    public String getAllProducts(Model model, @RequestParam Long shopId) {
+    public ResponseEntity<String> getAllProducts(Model model, @RequestParam Long shopId) {
         log.info("Создан запрос на список продуктов из магазина с id : {}", shopId);
-        List<InventoryDTO> inventories = invService.getAllProducts(shopId);
-        model.addAttribute("inventories", inventories);
-        model.addAttribute("shopId", shopId);
-        return "getAllProductsResult";
+        try {
+            List<InventoryDTO> inventories = invService.getAllProducts(shopId);
+            model.addAttribute("inventories", inventories);
+            model.addAttribute("shopId", shopId);
+            String htmlContent = renderHtmlTemplate("getAllProductsResult", model);
+            return ResponseEntity.ok(htmlContent);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Внутренняя ошибка сервера");
+        }
     }
 
     /**
@@ -71,18 +79,22 @@ public class InventoryController {
      * @return результат запроса
      */
     @PostMapping("/buyProduct")
-    public String buyProduct(@RequestParam Long shopId,
+    public ResponseEntity<String> buyProduct(@RequestParam Long shopId,
                              @RequestParam Long productId,
                              @RequestParam Integer count,
                              Model model) {
         log.info("Создан запрос на покупку продукта(-ов) в магазин с id : {}", shopId);
-
-        String resultMessage = invService.addProductToInventory(shopId, productId, count);
-
-        model.addAttribute("resultMessage", resultMessage);
-        model.addAttribute("shopId", shopId);
-
-        return "buyProductResult";
+        try {
+            String resultMessage = invService.addProductToInventory(shopId, productId, count);
+            model.addAttribute("resultMessage", resultMessage);
+            model.addAttribute("shopId", shopId);
+            String htmlContent = renderHtmlTemplate("buyProductResult", model);
+            return ResponseEntity.ok(htmlContent);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Внутренняя ошибка сервера");
+        }
     }
 
     /**
@@ -102,14 +114,24 @@ public class InventoryController {
      * @return результат запроса
      */
     @PostMapping("/sellProduct")
-    public String sellProduct(Model model, @RequestParam Long shopId, @RequestParam Long productId, @RequestParam Integer count) {
+    public ResponseEntity<String> sellProduct(Model model, @RequestParam Long shopId, @RequestParam Long productId, @RequestParam Integer count) {
         log.info("Создан запрос на продажу продукта(-ов) из магазина с id: {}", shopId);
+        try {
+            String resultMessage = invService.removeProductFromInventory(shopId, productId, count);
+            model.addAttribute("resultMessage", resultMessage);
+            model.addAttribute("shopId", shopId);
+            String htmlContent = renderHtmlTemplate("sellProductResult", model);
+            return ResponseEntity.ok(htmlContent);
+        } catch (NotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Внутренняя ошибка сервера");
+        }
+    }
 
-        String resultMessage = invService.removeProductFromInventory(shopId, productId, count);
-
-        model.addAttribute("resultMessage", resultMessage);
-        model.addAttribute("shopId", shopId);
-
-        return "sellProductResult";
+    private String renderHtmlTemplate(String templateName, Model model) {
+        Context context = new Context();
+        model.asMap().forEach(context::setVariable);
+        return thymeleafTemplateEngine.process(templateName, context);
     }
 }
