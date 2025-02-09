@@ -2,14 +2,11 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Результат продажи продукта</title>
+    <title>Результат продажи</title>
 </head>
 <body>
-<h1>Результат продажи продукта</h1>
-
-<p th:text="${resultMessage}">Здесь будет сообщение о результате операции</p>
-
-<a href="/api/inv/sellProductForm">Назад к форме покупки</a>
-<a href="/api/home">На главную</a>
+<h1>Результат продажи</h1>
+<p th:text="${resultMessage}"></p>
+<a href="/api/inv/sellProductForm">Вернуться к форме продажи</a>
 </body>
 </html>

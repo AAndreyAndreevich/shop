@@ -2,17 +2,25 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
-  <title>Введите ID магазина</title>
+  <title>Получить список продуктов</title>
+  <script>
+    function getAllProducts() {
+        const shopId = document.getElementById('shopId').value;
+        fetch(`/api/inv/getAllProducts?shopId=${shopId}`)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById('result').innerHTML = data;
+            })
+            .catch(error => console.error('Ошибка:', error));
+    }
+  </script>
 </head>
 <body>
-<h1>Введите ID магазина</h1>
-
-<form action="/getAllProducts" method="get">
-  <label for="shopId">ID магазина:</label>
-  <input type="number" id="shopId" name="shopId" required>
-  <button type="submit">Показать продукты</button>
-</form>
-
+<h1>Получить список продуктов</h1>
+<label for="shopId">ID магазина:</label>
+<input type="text" id="shopId" name="shopId">
+<button onclick="getAllProducts()">Получить список</button>
+<div id="result"></div>
 <a href="/api/home">На главную</a>
 </body>
 </html>

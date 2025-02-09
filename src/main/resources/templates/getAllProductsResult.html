@@ -5,27 +5,23 @@
     <title>Список продуктов</title>
 </head>
 <body>
-<h1>Продукты магазина с ID [[${shopId}]]</h1>
-
-<table border="1">
+<h1>Список продуктов</h1>
+<table>
     <thead>
     <tr>
-        <th>ID</th>
+        <th>ID продукта</th>
         <th>Название</th>
-        <th>Цена</th>
+        <th>Количество</th>
     </tr>
     </thead>
     <tbody>
     <tr th:each="product : ${products}">
-        <td th:text="${product.id}">Product ID</td>
-        <td th:text="${product.name}">Product Name</td>
-        <td th:text="${product.price}">Product Price</td>
+        <td th:text="${product.id}"></td>
+        <td th:text="${product.name}"></td>
+        <td th:text="${product.quantity}"></td>
     </tr>
     </tbody>
 </table>
-
-<a href="/getAllProductsForm">Назад к форме вызова списка</a>
-
-<a href="/api/home">На главную</a>
+<a href="/api/inv/getAllProductsForm">Вернуться к форме запроса</a>
 </body>
 </html>
