@@ -1,37 +1,42 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>Купить продукт</title>
-  <script>
-    function buyProduct() {
-        const shopId = document.getElementById('shopId').value;
-        const productId = document.getElementById('productId').value;
-        const count = document.getElementById('count').value;
+    <meta charset="UTF-8">
+    <title>Купить продукт</title>
+    <script>
+        function buyProduct() {
+            const shopId = document.getElementById('shopId').value;
+            const productId = document.getElementById('productId').value;
+            const count = document.getElementById('count').value;
 
-        fetch('/api/inv/buyProduct', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/x-www-form-urlencoded',
-            },
-            body: `shopId=${shopId}&productId=${productId}&count=${count}`
-        })
-        .then(response => {
-            if(!response.ok) {
-                return response.text().then(errorMessage => {
-                    throw new Error(errorMessage);
-                });
+            if (count < 0) {
+                alert("Количество не может быть отрицательным");
+                return;
             }
-            return response.text();
-        })
-        .then(data => {
-            document.getElementById('result').innerHTML = data;
-        })
-        .catch(error => {
-            document.getElementById('result').innerHTML = '<span style="color: red;">Ошибка, такого магазина или продукта не существует</span>';
-        });
-    }
-  </script>
+
+            fetch('/api/inv/buyProduct', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `shopId=${shopId}&productId=${productId}&count=${count}`
+            })
+            .then(response => {
+                if(!response.ok) {
+                    return response.text().then(errorMessage => {
+                        throw new Error(errorMessage);
+                    });
+                }
+                return response.text();
+            })
+            .then(data => {
+                document.getElementById('result').innerHTML = data;
+            })
+            .catch(error => {
+                document.getElementById('result').innerHTML = '<span style="color: red;">Ошибка, такого магазина или продукта не существует</span>';
+            });
+        }
+    </script>
 </head>
 <body>
 <h1>Купить продукт</h1>

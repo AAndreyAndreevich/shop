@@ -84,6 +84,9 @@ public class InventoryController {
                              @RequestParam Integer count,
                              Model model) {
         log.info("Создан запрос на покупку продукта(-ов) в магазин с id : {}", shopId);
+        if (count < 0) {
+            return ResponseEntity.badRequest().body("Количество не может быть отрицательным");
+        }
         try {
             String resultMessage = invService.addProductToInventory(shopId, productId, count);
             model.addAttribute("resultMessage", resultMessage);
@@ -116,6 +119,9 @@ public class InventoryController {
     @PostMapping("/sellProduct")
     public ResponseEntity<String> sellProduct(Model model, @RequestParam Long shopId, @RequestParam Long productId, @RequestParam Integer count) {
         log.info("Создан запрос на продажу продукта(-ов) из магазина с id: {}", shopId);
+        if (count < 0) {
+            return ResponseEntity.badRequest().body("Количество не может быть отрицательным");
+        }
         try {
             String resultMessage = invService.removeProductFromInventory(shopId, productId, count);
             model.addAttribute("resultMessage", resultMessage);

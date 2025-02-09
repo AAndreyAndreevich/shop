@@ -9,6 +9,11 @@
             const productId = document.getElementById('productId').value;
             const count = document.getElementById('count').value;
 
+            if (count < 0) {
+                alert("Количество не может быть отрицательным");
+                return;
+            }
+
             fetch('/api/inv/sellProduct', {
                 method: 'POST',
                 headers: {

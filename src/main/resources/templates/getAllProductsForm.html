@@ -1,28 +1,28 @@
 <!DOCTYPE html>
 <html lang="ru" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8">
-  <title>Получить список продуктов</title>
-  <script>
-    function getAllProducts() {
-        const shopId = document.getElementById('shopId').value;
-        fetch(`/api/inv/getAllProducts?shopId=${shopId}`)
-        .then(response => {
-            if(!response.ok) {
-                return response.text().then(errorMessage => {
-                    throw new Error(errorMessage);
-                });
-            }
-            return response.text();
-        })
-        .then(data => {
-            document.getElementById('result').innerHTML = data;
-        })
-        .catch(error => {
-            document.getElementById('result').innerHTML = '<span style="color: red;">Ошибка, такого магазина не существует</span>';
-        });
-    }
-  </script>
+    <meta charset="UTF-8">
+    <title>Получить список продуктов</title>
+    <script>
+        function getAllProducts() {
+            const shopId = document.getElementById('shopId').value;
+            fetch(`/api/inv/getAllProducts?shopId=${shopId}`)
+            .then(response => {
+                if(!response.ok) {
+                    return response.text().then(errorMessage => {
+                        throw new Error(errorMessage);
+                    });
+                }
+                return response.text();
+            })
+            .then(data => {
+                document.getElementById('result').innerHTML = data;
+            })
+            .catch(error => {
+                document.getElementById('result').innerHTML = '<span style="color: red;">Ошибка, такого магазина не существует</span>';
+            });
+        }
+    </script>
 </head>
 <body>
 <h1>Получить список продуктов</h1>

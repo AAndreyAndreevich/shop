@@ -1,9 +1,12 @@
 package app.dtos;
 
+import jakarta.validation.constraints.Min;
+
 public class InventoryDTO {
     private Long id;
     private Long shopId;
     private ProductDTO productDTO;
+    @Min(value = 0, message = "Количество не может быть отрицательным")
     private int quantity;
 
     public InventoryDTO() {

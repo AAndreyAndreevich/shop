@@ -1,6 +1,7 @@
 package app.entities;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 
 @Entity
 public class Inventory {
@@ -14,7 +15,7 @@ public class Inventory {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id")
     private Product product;
-
+    @Min(value = 0, message = "Количество не может быть отрицательным")
     private int quantity;
 
     public Inventory() {

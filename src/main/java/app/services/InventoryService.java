@@ -62,6 +62,9 @@ public class InventoryService {
                 .orElseThrow(() -> new NotFoundException("Магазин не найден"));
         Product product = productRepo.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Продукт не найден"));
+        if (count < 0) {
+            throw new IllegalArgumentException("Количество не может быть отрицательным");
+        }
 
         Optional<Inventory> optionalInventory = invRepo.findByShopIdAndProductId(shopId, productId);
         Inventory inventory = optionalInventory.orElseGet(() -> createNewInventory(shop, product));
@@ -78,9 +81,12 @@ public class InventoryService {
                 .orElseThrow(() -> new NotFoundException("Магазин не найден"));
         Product product = productRepo.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Продукт не найден"));
-
         Inventory inventory = invRepo.findByShopIdAndProductId(shopId, productId)
                 .orElseThrow(() -> new NotFoundException("Инвентарь не найден"));
+
+        if (count < 0) {
+            throw new IllegalArgumentException("Количество не может быть отрицательным");
+        }
 
         if (inventory.getQuantity() < count) {
             return "Недостаточно товара на складе";
