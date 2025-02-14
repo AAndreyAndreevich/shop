@@ -1,6 +1,7 @@
 package app.controllers;
 
 import app.dtos.InventoryDTO;
+import app.dtos.InventoryOperationResult;
 import app.handlers.NotFoundException;
 import app.services.InventoryService;
 import org.slf4j.Logger;
@@ -79,24 +80,31 @@ public class InventoryController {
      * @return результат запроса
      */
     @PostMapping("/buyProduct")
-    public ResponseEntity<String> buyProduct(@RequestParam Long shopId,
-                             @RequestParam Long productId,
-                             @RequestParam Integer count,
-                             Model model) {
+    public ResponseEntity<InventoryOperationResult> buyProduct(@RequestParam Long shopId,
+                                                               @RequestParam Long productId,
+                                                               @RequestParam Integer count,
+                                                               Model model) {
         log.info("Создан запрос на покупку продукта(-ов) в магазин с id : {}", shopId);
         if (count < 0) {
-            return ResponseEntity.badRequest().body("Количество не может быть отрицательным");
+            return ResponseEntity.badRequest().body(new InventoryOperationResult(
+                    "Количество не может быть отрицательным",
+                    null, null, 0
+            ));
         }
         try {
-            String resultMessage = invService.addProductToInventory(shopId, productId, count);
+            InventoryOperationResult resultMessage = invService.addProductToInventory(shopId, productId, count);
             model.addAttribute("resultMessage", resultMessage);
             model.addAttribute("shopId", shopId);
             String htmlContent = renderHtmlTemplate("buyProductResult", model);
-            return ResponseEntity.ok(htmlContent);
+            return ResponseEntity.ok(resultMessage);
         } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new InventoryOperationResult(
+                    e.getMessage(), null, null, 0
+            ));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Внутренняя ошибка сервера");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InventoryOperationResult(
+                    e.getMessage(), null, null, 0
+            ));
         }
     }
 

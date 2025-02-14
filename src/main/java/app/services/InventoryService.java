@@ -1,10 +1,13 @@
 package app.services;
 
 import app.dtos.InventoryDTO;
+import app.dtos.InventoryOperationResult;
 import app.dtos.ProductDTO;
 import app.entities.Inventory;
 import app.entities.Product;
 import app.entities.Shop;
+import app.handlers.InsufficientBalanceException;
+import app.handlers.InvalidInputException;
 import app.handlers.NotFoundException;
 import app.repositories.InventoryRepository;
 import app.repositories.ProductRepository;
@@ -15,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -57,22 +61,36 @@ public class InventoryService {
     }
 
     @Transactional
-    public String addProductToInventory(Long shopId, Long productId, Integer count) {
+    public InventoryOperationResult addProductToInventory(Long shopId, Long productId, Integer count) {
         Shop shop = shopRepo.findById(shopId)
                 .orElseThrow(() -> new NotFoundException("Магазин не найден"));
         Product product = productRepo.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Продукт не найден"));
         if (count < 0) {
-            throw new IllegalArgumentException("Количество не может быть отрицательным");
+            log.warn("Указано нулевое количество товаров");
+            throw new InvalidInputException("Количество не может быть отрицательным");
+        }
+
+        BigDecimal totalCost = product.getPrice().multiply(BigDecimal.valueOf(count));
+
+        if (shop.getBalance().compareTo(totalCost) < 0) {
+            log.warn("У магазина '{}' недостаточно средств на балансе", shop.getName());
+            throw new InsufficientBalanceException("Недостаточно средств на балансе");
         }
 
         Optional<Inventory> optionalInventory = invRepo.findByShopIdAndProductId(shopId, productId);
         Inventory inventory = optionalInventory.orElseGet(() -> createNewInventory(shop, product));
 
         inventory.setQuantity(inventory.getQuantity() + count);
+        shop.setBalance(shop.getBalance().subtract(totalCost));
+        shopRepo.save(shop);
         invRepo.save(inventory);
         log.info("Магазин '{}' добавил '{}' в количестве {} штук на склад", shop.getName(), product.getName(), count);
-        return "Товар успешно добавлен в инвентарь";
+
+        return new InventoryOperationResult(
+                "Товар успешно добавлен в инвентарь",
+                shop.getBalance(), product.getName(), count
+        );
     }
 
     @Transactional
