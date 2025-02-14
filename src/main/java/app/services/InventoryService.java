@@ -83,7 +83,6 @@ public class InventoryService {
 
         inventory.setQuantity(inventory.getQuantity() + count);
         shop.setBalance(shop.getBalance().subtract(totalCost));
-        shopRepo.save(shop);
         invRepo.save(inventory);
         log.info("Магазин '{}' добавил '{}' в количестве {} штук на склад", shop.getName(), product.getName(), count);
 
@@ -94,7 +93,7 @@ public class InventoryService {
     }
 
     @Transactional
-    public String removeProductFromInventory(Long shopId, Long productId, Integer count) {
+    public InventoryOperationResult removeProductFromInventory(Long shopId, Long productId, Integer count) {
         Shop shop = shopRepo.findById(shopId)
                 .orElseThrow(() -> new NotFoundException("Магазин не найден"));
         Product product = productRepo.findById(productId)
@@ -106,14 +105,20 @@ public class InventoryService {
             throw new IllegalArgumentException("Количество не может быть отрицательным");
         }
 
-        if (inventory.getQuantity() < count) {
-            return "Недостаточно товара на складе";
-        }
+        BigDecimal totalCost = product.getPrice().multiply(BigDecimal.valueOf(count));
 
+        if (inventory.getQuantity() < count) {
+            log.warn("Указанное количество больше количества товара на складе");
+            throw new InvalidInputException("Недостаточно количества на складе");
+        }
+        shop.setBalance(shop.getBalance().add(totalCost));
         inventory.setQuantity(inventory.getQuantity() - count);
         invRepo.save(inventory);
         log.info("Магазин '{}' удалил '{}' в количестве {} штук со склада", shop.getName(), product.getName(), count);
-        return "Товар успешно удален из инвентаря";
+        return new InventoryOperationResult(
+                "Товар успешно удален из инвентаря",
+                shop.getBalance(), product.getName(), count
+        );
     }
 
     private Inventory createNewInventory(Shop shop, Product product) {

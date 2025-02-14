@@ -125,21 +125,28 @@ public class InventoryController {
      * @return результат запроса
      */
     @PostMapping("/sellProduct")
-    public ResponseEntity<String> sellProduct(Model model, @RequestParam Long shopId, @RequestParam Long productId, @RequestParam Integer count) {
+    public ResponseEntity<InventoryOperationResult> sellProduct(Model model, @RequestParam Long shopId, @RequestParam Long productId, @RequestParam Integer count) {
         log.info("Создан запрос на продажу продукта(-ов) из магазина с id: {}", shopId);
         if (count < 0) {
-            return ResponseEntity.badRequest().body("Количество не может быть отрицательным");
+            return ResponseEntity.badRequest().body(new InventoryOperationResult(
+                    "Количество не может быть отрицательным",
+                    null, null, 0
+            ));
         }
         try {
-            String resultMessage = invService.removeProductFromInventory(shopId, productId, count);
+            InventoryOperationResult resultMessage = invService.removeProductFromInventory(shopId, productId, count);
             model.addAttribute("resultMessage", resultMessage);
             model.addAttribute("shopId", shopId);
             String htmlContent = renderHtmlTemplate("sellProductResult", model);
-            return ResponseEntity.ok(htmlContent);
+            return ResponseEntity.ok(resultMessage);
         } catch (NotFoundException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new InventoryOperationResult(
+                    e.getMessage(), null, null, 0
+            ));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Внутренняя ошибка сервера");
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new InventoryOperationResult(
+                    e.getMessage(), null, null, 0
+            ));
         }
     }
 
