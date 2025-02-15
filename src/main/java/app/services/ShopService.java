@@ -2,8 +2,6 @@ package app.services;
 
 import app.entities.Shop;
 import app.handlers.NotFoundException;
-import app.repositories.InventoryRepository;
-import app.repositories.ProductRepository;
 import app.repositories.ShopRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
